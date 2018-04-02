@@ -1,32 +1,70 @@
 import List from './list';
+import axios from 'axios';
 import AddForm from './add_form';
 import React, { Component } from 'react';
-import ListData from '../data/todo_items';
 import 'materialize-css/dist/css/materialize.min.css';
+
+const BASE_URL = 'http://api.reactprototypes.com';
+const API_KEY = '?key=jeffreicher15';
 
 class App extends Component {
     constructor(props){
         super(props);
 
         this.state = {
-            list: ListData
+            list: []
         };
     };
 
-    deleteItem(item) {
-        console.log(item);
-        const newList = [...this.state.list];
-        newList.splice(item, 1);
-        console.log('New:', newList);
-        console.log('Old:',this.state.list);
-        this.setState({
-            list: newList
+    componentDidMount() {
+        this.getListItems();
+    }
+
+    getListItems() {
+        axios.get(`${BASE_URL}/todos/${API_KEY}`).then(resp => {
+            console.log('Server response:', resp);
+            this.setState({
+                list: resp.data.todos
+            });
+        }).catch(err => {
+            console.log('Error:', err.message);
         });
+    }
+
+    getOneItem() {
+        //axios.get
+        //url: http://api.reactprototypes.com/todos/[item id]?key=[your api key]
+    }
+
+    toggleComplete() {
+        //axios.put 
+        //url: http://api.reactprototypes.com/todos/[item id]?key=[your api key]
+    }
+
+    deleteItem(item) {
+        axios.delete(`${BASE_URL}/todos/${API_KEY}`, item).then(resp => {
+            console.log('Item to delete:', resp);
+            this.getListItems();
+        }).catch(err => {
+            console.log('Error:', err.message);
+        });
+
+        //axios.delete to delete an item
+        //url: http://api.reactprototypes.com/todos/[item id]?key=[your api key]
+        // console.log(item);
+        // const newList = [...this.state.list];
+        // newList.splice(item, 1);
+        // console.log('New:', newList);
+        // console.log('Old:',this.state.list);
+        // this.setState({
+        //     list: newList
+        // });
     };
 
     addItem(item) {
-        this.setState({
-            list: [item, ...this.state.list]
+        axios.post(`${BASE_URL}/todos/${API_KEY}`, item).then(resp => {
+            console.log('Item Added:', resp);
+            this.getListItems();
         });
     };
 
